@@ -1,4 +1,4 @@
-package util;
+package http.util;
 
 import db.Database;
 import model.User;
@@ -40,6 +40,7 @@ public class    HeaderParser {
             String[] tokens = data[i].split("=");
             userData.add(tokens[1]);
         }
+
         User user = new User(userData.get(0),userData.get(1),userData.get(2),userData.get(3));
         Database.addUser(user);
         return user;
