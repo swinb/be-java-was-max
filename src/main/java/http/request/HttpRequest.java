@@ -22,6 +22,10 @@ public class HttpRequest {
         return requestPath;
     }
 
+    public String getRequestBody() {
+        return requestBody;
+    }
+
     public HttpRequest(HttpRequestBuilder httpRequestBuilder) {
         this.headers = httpRequestBuilder.headers;
         this.httpMethod = httpRequestBuilder.httpMethod;
@@ -29,7 +33,7 @@ public class HttpRequest {
         this.requestBody = httpRequestBuilder.requestBody;
     }
 
-    public static class HttpRequestBuilder{
+    public static class HttpRequestBuilder {
         private Map<String, String> headers;
         private String httpMethod;
         private String requestPath;
@@ -42,7 +46,7 @@ public class HttpRequest {
             this.requestBody = requestBody;
         }
 
-        public HttpRequest build(){
+        public HttpRequest build() {
             return new HttpRequest(this);
         }
     }
