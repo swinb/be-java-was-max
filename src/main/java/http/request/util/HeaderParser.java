@@ -1,6 +1,7 @@
 package http.request.util;
 
 import http.request.HttpRequest;
+import http.util.IOUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,11 +18,11 @@ public class HeaderParser {
         String body = null;
 
         while (!((headersLine = httpHeaders.readLine()).equals(""))) {
-            String[] tokens = InputUtil.parsingSemicolonLine(headersLine);
+            String[] tokens = IOUtil.splitBySemicolon(headersLine);
             headers.put(tokens[0], tokens[1]);
         }
         if(headers.containsKey("Content-Length")){
-            body = InputUtil.readRequestBody(httpHeaders, Integer.parseInt(headers.get("Content-Length")));
+            body = IOUtil.readRequestBody(httpHeaders, Integer.parseInt(headers.get("Content-Length")));
         }
 
         String[] tokens = requestLine.split(" ");
