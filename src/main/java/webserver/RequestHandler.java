@@ -3,10 +3,14 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
+import java.util.List;
 
+import http.request.HttpRequest;
+import http.response.HttpResponse;
+import http.response.util.RequestLineParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.HeaderParser;
+import http.request.util.HeaderParser;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -22,34 +26,29 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-            String firstHeaderLine = br.readLine();
-            String path = HeaderParser.getURL(firstHeaderLine);
-            String resourcePath = HeaderParser.getResourcePath(path);
-            String contentType = HeaderParser.getContentType(path);
-            logger.debug("Client Request = " + path);
-            while (!firstHeaderLine.equals("")) {
-                logger.debug(firstHeaderLine);
-                firstHeaderLine = br.readLine();
-            }
-            if(HeaderParser.checkRequestType(path)){
-                resourcePath = "/templates";
-                path = "/index.html";
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            HttpRequest httpRequest = HeaderParser.getHttpRequest(br);
+            RequestLineParser requestLineParser = new RequestLineParser(httpRequest);
+            HttpResponse httpResponse = requestLineParser.getHttpResponse();
+
+            for(String a : httpRequest.getHeaders()){
+                logger.debug(a);
             }
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = Files.readAllBytes(new File("./src/main/resources" +resourcePath + path).toPath());
-            response200Header(dos, body.length,contentType);
+            logger.debug("Client Request = " + httpRequest.getRequestPath());
+            byte[] body = httpResponse.getBody();
+            response200Header(dos, httpResponse.getStatusLine());
             responseBody(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent,String contentType) {
+    private void response200Header(DataOutputStream dos, List<String> statusLine) {
         try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: "+contentType+"\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            for(String line : statusLine){
+                dos.writeBytes(line);
+            }
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
