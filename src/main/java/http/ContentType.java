@@ -5,11 +5,11 @@ import java.util.Arrays;
 
 public enum ContentType {
     HTML("html","text/html"),
-    JPG("jpg", "text/html"),
-    PNG("png", "text/html"),
-    CSS("css", "text/html"),
-    JS("js", "text/html"),
-    ICO("ico", "text/html"),
+    JPG("jpg", "image/jpeg"),
+    PNG("png", "image/png"),
+    CSS("css", "text/css"),
+    JS("js", "text/javascript"),
+    ICO("ico", "image/x-icon"),
     EMPTY("empty","empty");
 
     private final String requestType;
@@ -24,9 +24,10 @@ public enum ContentType {
         return contentType;
     }
 
-    public static ContentType findByRequestType(String requestCode){
+    public static ContentType findByRequestType(String requestPath){
+        String[] tokens = requestPath.split("\\.");
         return Arrays.stream(ContentType.values())
-                .filter(contentType -> contentType.requestType.equals(requestCode))
+                .filter(contentType -> contentType.requestType.equals(tokens[tokens.length-1]))
                 .findAny()
                 .orElse(EMPTY);
     }
