@@ -1,15 +1,16 @@
 package http.request;
 
-import java.util.List;
+import java.util.Map;
 
 
 public class HttpRequest {
 
-    private List<String> headers;
+    private Map<String, String> headers;
     private String httpMethod;
     private String requestPath;
+    private String requestBody;
 
-    public List<String> getHeaders() {
+    public Map<String, String> getHeaders() {
         return headers;
     }
 
@@ -21,9 +22,28 @@ public class HttpRequest {
         return requestPath;
     }
 
-    public HttpRequest(List<String> headers, String httpMethod, String requestPath) {
-        this.headers = headers;
-        this.httpMethod = httpMethod;
-        this.requestPath = requestPath;
+    public HttpRequest(HttpRequestBuilder httpRequestBuilder) {
+        this.headers = httpRequestBuilder.headers;
+        this.httpMethod = httpRequestBuilder.httpMethod;
+        this.requestPath = httpRequestBuilder.requestPath;
+        this.requestBody = httpRequestBuilder.requestBody;
+    }
+
+    public static class HttpRequestBuilder{
+        private Map<String, String> headers;
+        private String httpMethod;
+        private String requestPath;
+        private String requestBody;
+
+        public HttpRequestBuilder(Map<String, String> headers, String httpMethod, String requestPath, String requestBody) {
+            this.headers = headers;
+            this.httpMethod = httpMethod;
+            this.requestPath = requestPath;
+            this.requestBody = requestBody;
+        }
+
+        public HttpRequest build(){
+            return new HttpRequest(this);
+        }
     }
 }
